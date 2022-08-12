@@ -2,6 +2,7 @@ package com.shaynecomptondev.hebimageapi;
 
 import com.shaynecomptondev.hebimageapi.services.GoogleImageAnalyzer;
 import com.shaynecomptondev.hebimageapi.services.ImageAnalyzer;
+import com.shaynecomptondev.hebimageapi.services.ImageService;
 import com.shaynecomptondev.hebimageapi.services.ImageServiceImpl;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,7 +17,7 @@ public class HebImageApiApplication {
 
 	//todo move beans to configuration file
 	@Bean
-	public ImageServiceImpl getImageService() {
+	public ImageService getImageService() {
 		return new ImageServiceImpl();
 	}
 	@Bean
