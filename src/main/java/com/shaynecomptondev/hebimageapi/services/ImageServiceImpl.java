@@ -1,5 +1,10 @@
 package com.shaynecomptondev.hebimageapi.services;
 
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 import com.shaynecomptondev.hebimageapi.dtos.ImageDto;
 import com.shaynecomptondev.hebimageapi.dtos.ImageMetadataDto;
 import com.shaynecomptondev.hebimageapi.dtos.ImageObjectsDto;
@@ -9,10 +14,15 @@ import com.shaynecomptondev.hebimageapi.entities.ImageMetadata;
 import com.shaynecomptondev.hebimageapi.entities.ImageObject;
 import com.shaynecomptondev.hebimageapi.exceptions.ImageNotFoundException;
 import com.shaynecomptondev.hebimageapi.repositories.ImageRepository;
-import org.hibernate.boot.Metadata;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.w3c.dom.Node;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.metadata.IIOMetadata;
+import javax.imageio.stream.ImageInputStream;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -83,7 +93,7 @@ public class ImageServiceImpl implements ImageService {
         }
 
         //todo get image metadata
-        Iterable<ImageMetadataDto> imageMetadata = null;
+        Iterable<ImageMetadataDto> imageMetadata = GetImageMetadata(imageContents);
 
         //Detect objects if specified
         Iterable<ImageObjectsDto> detectedObjects = null;
@@ -196,5 +206,29 @@ public class ImageServiceImpl implements ImageService {
         }
 
         return image;
+    }
+
+    private Iterable<ImageMetadataDto> GetImageMetadata(byte[] imageContent) {
+        ArrayList<ImageMetadataDto> metadataDtos = new ArrayList<>();
+        ImageMetadataDto tempMetadataDto = null;
+        try {
+            //https://github.com/drewnoakes/metadata-extractor
+            Metadata metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(imageContent));
+            for (Directory directory : metadata.getDirectories()) {
+                for (Tag tag : directory.getTags()) {
+                    String[] properties = tag.toString().split(" - ");
+                    tempMetadataDto = new ImageMetadataDto();
+                    tempMetadataDto.setName(properties[0]);
+                    tempMetadataDto.setValue(properties[1]);
+                    metadataDtos.add(tempMetadataDto);
+                }
+            }
+            String something = "";
+        } catch (ImageProcessingException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return metadataDtos;
     }
 }
