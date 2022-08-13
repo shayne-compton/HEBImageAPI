@@ -16,6 +16,17 @@ public class ImageObject {
     @JoinColumn(name="image_id")
     private Image image;
 
+    public ImageObject() { }
+
+    private ImageObject(Integer id, String name, Double score, Date createDate, boolean isActive, Image image) {
+        this.id = id;
+        this.name = name;
+        this.score = score;
+        this.createDate = createDate;
+        this.isActive = isActive;
+        this.image = image;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -62,5 +73,49 @@ public class ImageObject {
 
     public void setImage(Image image) {
         this.image = image;
+    }
+
+    public static ImageObjectBuilder builder() { return new ImageObjectBuilder(); }
+
+    public static class ImageObjectBuilder {
+
+        private Integer id;
+        private String name;
+        private Double score;
+        private Date createDate;
+        private boolean isActive;
+        private Image image;
+
+        public ImageObjectBuilder setId(Integer id) {
+            this.id = id;
+            return this;
+        }
+
+        public ImageObjectBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public ImageObjectBuilder setScore(Double score) {
+            this.score = score;
+            return this;
+        }
+
+        public ImageObjectBuilder setCreateDate(Date createDate) {
+            this.createDate = createDate;
+            return this;
+        }
+
+        public ImageObjectBuilder setActive(boolean active) {
+            isActive = active;
+            return this;
+        }
+
+        public ImageObjectBuilder setImage(Image image) {
+            this.image = image;
+            return this;
+        }
+
+        public ImageObject build() { return new ImageObject(id, name, score, createDate, isActive, image); }
     }
 }

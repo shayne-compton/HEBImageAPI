@@ -42,4 +42,29 @@ public class ImageObjectsDto {
     public void setScore(String score) {
         this.score = score;
     }
+
+    public static ImageObjectsDtoBuilder builder() { return new ImageObjectsDtoBuilder(); }
+
+    public static class ImageObjectsDtoBuilder {
+        private String id;
+        private String name;
+        private String score;
+
+        public ImageObjectsDtoBuilder setId(String id) {
+            this.id = id;
+            return this;
+        }
+
+        public ImageObjectsDtoBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public ImageObjectsDtoBuilder setScore(String score) {
+            this.score = score;
+            return this;
+        }
+
+        public ImageObjectsDto build() { return new ImageObjectsDto(id, name, score); }
+    }
 }
