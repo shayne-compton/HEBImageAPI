@@ -13,6 +13,7 @@ import com.shaynecomptondev.hebimageapi.entities.Image;
 import com.shaynecomptondev.hebimageapi.entities.ImageMetadata;
 import com.shaynecomptondev.hebimageapi.entities.ImageObject;
 import com.shaynecomptondev.hebimageapi.exceptions.ImageNotFoundException;
+import com.shaynecomptondev.hebimageapi.exceptions.InvalidParameterException;
 import com.shaynecomptondev.hebimageapi.repositories.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -48,7 +49,6 @@ public class ImageServiceImpl implements ImageService {
         //strip quotes of beginning and end of string, if they exist
         objects = objects.replaceAll("^\"|\"$", "");
         String[] tokenizedObjects = objects.split(",");
-        //todo validate input parameters
         Iterable<Image> images = imageRepository.findAllByObjectActive(tokenizedObjects);
         ArrayList<ImageDto> imageDtos = new ArrayList<>();
         for (Image image : images)
@@ -60,7 +60,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public ImageDto GetImageById(int imageId) {
-        //todo validate input parameters
+        if (imageId < 1) {
+            throw new InvalidParameterException("imageId must be a positive integer");
+        }
         Optional<Image> image = imageRepository.findById(imageId);
         if (image.isPresent()) {
             ImageDto imageDto = MapEntityToDto(image.get());
@@ -72,7 +74,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public ImageDto SaveImage(ImageUploadDto image) {
-        //todo validate input parameters
+        ValidateImageUploadDto(image);
         boolean shouldDetectObjects = image.isEnableObjectDetection();
         //todo check if image is from url or byte array
         byte[] imageContents = null;
@@ -94,6 +96,8 @@ public class ImageServiceImpl implements ImageService {
         {
             detectedObjects = imageAnalyzer.DetectObjects(imageContents);
         }
+        String imageLabel = GetImageLabel(image.getLabel(), detectedObjects);
+        image.setLabel(imageLabel);
         //save our image
         Image newImage = MapUploadToEntity(image, imageContents, detectedObjects, imageMetadata);
         newImage = imageRepository.save(newImage);
@@ -101,10 +105,40 @@ public class ImageServiceImpl implements ImageService {
         return newImageDto;
     }
 
+    private void ValidateImageUploadDto(ImageUploadDto image) {
+        if (image == null) {
+            throw new InvalidParameterException("image upload must not be null");
+        }
+        if (image.getImageUrl() != null && image.getImage() != null) {
+            throw new InvalidParameterException("please only provide either an image url or an image");
+        }
+        if (image.getImageUrl() == null && image.getImage() == null) {
+            throw new InvalidParameterException("please provide either an image or image url");
+        }
+    }
+
+    private String GetImageLabel(String label, Iterable<ImageObjectsDto> detectedObjects) {
+        if ((label == null || label == "") && detectedObjects != null) {
+            double currentHighScore = 0;
+            double currentImageScore = 0;
+            String generatedLabel = "";
+            for (ImageObjectsDto imageObjectsDto : detectedObjects) {
+                currentImageScore = Double.parseDouble(imageObjectsDto.getScore());
+                if (currentImageScore > currentHighScore) {
+                    generatedLabel = imageObjectsDto.getName();
+                }
+            }
+            label = generatedLabel;
+        }
+
+        return label;
+    }
+
     private ImageDto MapEntityToDto(Image image) {
         ImageDto imageDto = new ImageDto();
         imageDto.setId(image.getId());
         imageDto.setContent(image.getContent());
+        imageDto.setLabel(image.getLabel());
         //map metadata
         if (image.getImageMetadata() != null) {
             ArrayList<ImageMetadataDto> metadataDtos = new ArrayList<>();
@@ -144,6 +178,7 @@ public class ImageServiceImpl implements ImageService {
         image.setContent(imageContent);
         image.setActive(true);
         image.setCreateDate(today);
+        image.setLabel(imageDto.getLabel());
 
         String imageUrl = imageDto.getImageUrl();
         if (imageUrl != null && imageDto.getImage() == null) {
