@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.shaynecomptondev.hebimageapi.dtos.GoogleImageDetectionResponseDto;
 import com.shaynecomptondev.hebimageapi.dtos.ImageObjectsDto;
+import com.shaynecomptondev.hebimageapi.exceptions.ImageAnalyzerClientException;
+import com.shaynecomptondev.hebimageapi.exceptions.ImageAnalyzerServerException;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.IOException;
@@ -64,6 +66,11 @@ public class GoogleImageAnalyzer implements ImageAnalyzer {
                     .build();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
+            if (response.statusCode() >= 400 && response.statusCode() <= 499) {
+                throw new ImageAnalyzerClientException("response code: " + response.statusCode());
+            } else if (response.statusCode() >= 500 && response.statusCode() <= 599) {
+                throw new ImageAnalyzerServerException();
+            }
 
             String jsonResponse = response.body();
             ObjectMapper mapper = new ObjectMapper();
