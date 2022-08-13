@@ -3,16 +3,16 @@ package com.shaynecomptondev.hebimageapi.dtos;
 public class ImageDto {
     private int id;
     private byte[] content;
-    private String name;
+    private String label;
     private ImageObjectsDto[] detectedObjects;
     private ImageMetadataDto[] metadata;
 
     public ImageDto() { }
 
-    public ImageDto(int id, byte[] content, String name, ImageObjectsDto[] detectedObjects, ImageMetadataDto[] metadata) {
+    public ImageDto(int id, byte[] content, String label, ImageObjectsDto[] detectedObjects, ImageMetadataDto[] metadata) {
         this.id = id;
         this.content = content;
-        this.name = name;
+        this.label = label;
         this.detectedObjects = detectedObjects;
         this.metadata = metadata;
     }
@@ -33,12 +33,12 @@ public class ImageDto {
         this.content = content;
     }
 
-    public String getName() {
-        return name;
+    public String getLabel() {
+        return label;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public ImageObjectsDto[] getDetectedObjects() {
@@ -62,7 +62,7 @@ public class ImageDto {
     public static class ImageDtoBuilder {
         private int id;
         private byte[] content;
-        private String name;
+        private String label;
         private ImageObjectsDto[] detectedObjects;
         private ImageMetadataDto[] metadata;
 
@@ -76,8 +76,8 @@ public class ImageDto {
             return this;
         }
 
-        public ImageDtoBuilder setName(String name) {
-            this.name = name;
+        public ImageDtoBuilder setLabel(String label) {
+            this.label = label;
             return this;
         }
 
@@ -91,6 +91,6 @@ public class ImageDto {
             return this;
         }
 
-        public ImageDto build() { return new ImageDto(id, content, name, detectedObjects, metadata); }
+        public ImageDto build() { return new ImageDto(id, content, label, detectedObjects, metadata); }
     }
 }

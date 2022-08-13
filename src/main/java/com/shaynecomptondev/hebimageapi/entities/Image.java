@@ -12,6 +12,7 @@ public class Image {
     @Lob
     private byte[] content;
     private String source;
+    private String label;
     private Date createDate;
     private boolean isActive;
     @OneToMany(mappedBy = "image", cascade = {CascadeType.ALL})
@@ -21,10 +22,11 @@ public class Image {
 
     public Image() { }
 
-    private Image(Integer id, byte[] content, String source, Date createDate, boolean isActive, Set<ImageMetadata> imageMetadata, Set<ImageObject> imageObjects) {
+    private Image(Integer id, byte[] content, String source, String label, Date createDate, boolean isActive, Set<ImageMetadata> imageMetadata, Set<ImageObject> imageObjects) {
         this.id = id;
         this.content = content;
         this.source = source;
+        this.label = label;
         this.createDate = createDate;
         this.isActive = isActive;
         this.imageMetadata = imageMetadata;
@@ -53,6 +55,14 @@ public class Image {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public Date getCreateDate() {
@@ -95,6 +105,7 @@ public class Image {
         private Integer id;
         private byte[] content;
         private String source;
+        private String label;
         private Date createDate;
         private boolean isActive;
         private Set<ImageMetadata> imageMetadata;
@@ -112,6 +123,11 @@ public class Image {
 
         public ImageBuilder setSource(String source) {
             this.source = source;
+            return this;
+        }
+
+        public ImageBuilder setLabel(String label) {
+            this.label = label;
             return this;
         }
 
@@ -135,6 +151,6 @@ public class Image {
             return this;
         }
 
-        public Image build() { return new Image(id, content, source, createDate, isActive, imageMetadata, imageObjects);}
+        public Image build() { return new Image(id, content, source, label, createDate, isActive, imageMetadata, imageObjects);}
     }
 }
