@@ -8,6 +8,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+/**
+ * Handles InvalidParameterExceptions
+ *
+ * @author Shayne Compton
+ */
 @ControllerAdvice
 public class InvalidParameterAdvice {
 

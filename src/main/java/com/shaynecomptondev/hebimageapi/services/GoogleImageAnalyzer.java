@@ -19,6 +19,12 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
+/**
+ * <p>Provides image detection capabilities using googles cloud vision platform</p>
+ * <p>See the <a href="https://cloud.google.com/vision/docs">Google Vision Docs</a> for details</p>
+ *
+ * @author Shayne Compton
+ */
 public class GoogleImageAnalyzer implements ImageAnalyzer {
 
     @Value("${GoogleVisionUri}")
@@ -34,6 +40,12 @@ public class GoogleImageAnalyzer implements ImageAnalyzer {
         this.apiKey = apiKey;
     }
 
+    /**
+     * @param content byte[] representation of an image file
+     * @return all detected objects for specified image
+     * @throws ImageAnalyzerClientException when api returns a client error response
+     * @throws ImageAnalyzerServerException when api returns a server error response
+     */
     @Override
     public Iterable<ImageObjectsDto> DetectObjects(byte[] content) {
         if (content == null) {

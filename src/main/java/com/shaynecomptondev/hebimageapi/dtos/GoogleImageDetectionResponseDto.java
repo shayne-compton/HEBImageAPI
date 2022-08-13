@@ -3,6 +3,9 @@ package com.shaynecomptondev.hebimageapi.dtos;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * @author Shayne Compton
+ */
 public class GoogleImageDetectionResponseDto {
     public final Response responses[];
 

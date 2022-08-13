@@ -1,5 +1,8 @@
 package com.shaynecomptondev.hebimageapi.dtos;
 
+/**
+ * @author Shayne Compton
+ */
 public class ImageMetadataDto {
     private String Id;
     private String Name;

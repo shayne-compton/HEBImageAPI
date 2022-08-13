@@ -6,6 +6,11 @@ import com.shaynecomptondev.hebimageapi.services.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Provides REST endpoints to manage Images
+ *
+ * @author Shayne Compton
+ */
 @RestController
 public class ImageController {
 

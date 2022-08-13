@@ -8,8 +8,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 
+/**
+ * Provides capability to download a file from a webpage
+ *
+ * @Author Shayne Compton
+ */
 public class DownloadServiceImpl implements DownloadService {
 
+    /**
+     * @param url A valid url for the file
+     * @return a byte[] for the downloaded file
+     * @throws InvalidUrlException
+     */
     @Override
     public byte[] DownloadFileFromUrl(String url) {
         ValidateDownloadFileFromUrlParameters(url);

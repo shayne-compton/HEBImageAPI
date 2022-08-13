@@ -4,6 +4,9 @@ import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
 
+/**
+ * @author Shayne Compton
+ */
 @Entity
 public class Image {
     @Id

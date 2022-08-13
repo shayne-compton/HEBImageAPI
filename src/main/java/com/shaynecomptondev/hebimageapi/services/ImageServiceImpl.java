@@ -22,17 +22,39 @@ import java.io.IOException;
 import java.util.*;
 
 
+/**
+ * Abstraction layer providing functions to interact with external infrastructure
+ * such as databases and third party APIs
+ *
+ * @author Shayne Compton
+ *
+ */
 public class ImageServiceImpl implements ImageService {
 
+    /**
+     * Repository for CRUD operations dealing with Image entities
+     */
     @Autowired
     private ImageRepository imageRepository;
 
+
+    /**
+     * Provides image detection capabilities
+     */
     @Autowired
     private ImageAnalyzer imageAnalyzer;
 
+
+    /**
+     * Provides functions to download files from external webpages
+     */
     @Autowired
     private DownloadService downloadService;
 
+    /**
+     * <p>Gets all active persisted images</p>
+     * @return all active images from database
+     */
     @Override
     public Iterable<ImageDto> GetAllImages() {
         Iterable<Image> images = imageRepository.findAllActive();
@@ -44,6 +66,11 @@ public class ImageServiceImpl implements ImageService {
         return imageDtos;
     }
 
+    /**
+     * <p>Gets all active persisted images for a specified object query</p>
+     * @param objects a comma separated string containing objects to search for (ex: "dog","cat")
+     * @return all active images that match object criteria
+     */
     @Override
     public Iterable<ImageDto> GetImagesByObjects(String objects) {
         //strip quotes of beginning and end of string, if they exist
@@ -58,6 +85,14 @@ public class ImageServiceImpl implements ImageService {
         return imageDtos;
     }
 
+    /**
+     * <p>Returns a single persisted image for a specified id, if it exists</p>
+     *
+     * @param imageId the id of the image to return
+     * @return the image that belongs to the specified Id
+     * @throws ImageNotFoundException when image does not exist
+     * @throws InvalidParameterException
+     */
     @Override
     public ImageDto GetImageById(int imageId) {
         if (imageId < 1) {
@@ -72,6 +107,18 @@ public class ImageServiceImpl implements ImageService {
         }
     }
 
+    /**
+     * <p>Processes a byte representation of an image from either a file or imageUrl, according to specified parameter.
+     * Metadata will be extracted from the image.
+     * Detected objects in the image will be returned if specified by caller.
+     * Image, metadata, and any detected objects will be persisted to the database.
+     *
+     * Upon successful processing, all persisted image information will be returned to caller.</p>
+     *
+     * @param image criteria specified regarding how to process an uploaded image
+     * @return representation of the image that was persisted, including any metadata that was obtained
+     * @throws InvalidParameterException
+     */
     @Override
     public ImageDto SaveImage(ImageUploadDto image) {
         ValidateImageUploadDto(image);
@@ -222,11 +269,20 @@ public class ImageServiceImpl implements ImageService {
         return image;
     }
 
+    /**
+     * <p>Processes a byte[] representation of an image file and returns all extracted metadata
+     *
+     * Metadata is obtained using the following library:
+     * <a href="https://github.com/drewnoakes/metadata-extractor">https://github.com/drewnoakes/metadata-extractor</a>
+     * </p>
+     *
+     * @param imageContent a byte array representation of an image file
+     * @return all metadata extracted from the image file
+     */
     public Iterable<ImageMetadataDto> GetImageMetadata(byte[] imageContent) {
         ArrayList<ImageMetadataDto> metadataDtos = new ArrayList<>();
         ImageMetadataDto tempMetadataDto = null;
         try {
-            //https://github.com/drewnoakes/metadata-extractor
             Metadata metadata = ImageMetadataReader.readMetadata(new ByteArrayInputStream(imageContent));
             for (Directory directory : metadata.getDirectories()) {
                 for (Tag tag : directory.getTags()) {

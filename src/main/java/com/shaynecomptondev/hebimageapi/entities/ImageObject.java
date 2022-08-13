@@ -3,6 +3,9 @@ package com.shaynecomptondev.hebimageapi.entities;
 import javax.persistence.*;
 import java.util.Date;
 
+/**
+ * @author Shayne Compton
+ */
 @Entity
 public class ImageObject {
     @Id
