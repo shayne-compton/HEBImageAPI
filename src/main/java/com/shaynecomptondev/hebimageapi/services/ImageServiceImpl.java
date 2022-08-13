@@ -15,18 +15,9 @@ import com.shaynecomptondev.hebimageapi.entities.ImageObject;
 import com.shaynecomptondev.hebimageapi.exceptions.ImageNotFoundException;
 import com.shaynecomptondev.hebimageapi.repositories.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.w3c.dom.Node;
 
-import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
-import javax.imageio.metadata.IIOMetadata;
-import javax.imageio.stream.ImageInputStream;
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.net.URL;
 import java.util.*;
 
 
@@ -37,6 +28,9 @@ public class ImageServiceImpl implements ImageService {
 
     @Autowired
     private ImageAnalyzer imageAnalyzer;
+
+    @Autowired
+    private DownloadService downloadService;
 
     @Override
     public Iterable<ImageDto> GetAllImages() {
@@ -85,15 +79,14 @@ public class ImageServiceImpl implements ImageService {
         String imageUrl = image.getImageUrl();
         if (imageUrl != null)
         {
-            imageContents = DownloadImageFromUrl(imageUrl);
+            imageContents = downloadService.DownloadFileFromUrl(imageUrl);
         }
         else
         {
             imageContents = image.getImage();
         }
 
-        //todo get image metadata
-        Iterable<ImageMetadataDto> imageMetadata = GetImageMetadata(imageContents);
+        Iterable<ImageMetadataDto> imageMetadata = this.GetImageMetadata(imageContents);
 
         //Detect objects if specified
         Iterable<ImageObjectsDto> detectedObjects = null;
@@ -106,20 +99,6 @@ public class ImageServiceImpl implements ImageService {
         newImage = imageRepository.save(newImage);
         ImageDto newImageDto = MapEntityToDto(newImage);
         return newImageDto;
-    }
-
-    private byte[] DownloadImageFromUrl(String url) {
-        try (BufferedInputStream in = new BufferedInputStream(new URL(url).openStream());
-             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-            byte dataBuffer[] = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                byteArrayOutputStream.write(dataBuffer, 0, bytesRead);
-            }
-            return byteArrayOutputStream.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException("Image could not be loaded from supplied URL");
-        }
     }
 
     private ImageDto MapEntityToDto(Image image) {
@@ -208,7 +187,7 @@ public class ImageServiceImpl implements ImageService {
         return image;
     }
 
-    private Iterable<ImageMetadataDto> GetImageMetadata(byte[] imageContent) {
+    public Iterable<ImageMetadataDto> GetImageMetadata(byte[] imageContent) {
         ArrayList<ImageMetadataDto> metadataDtos = new ArrayList<>();
         ImageMetadataDto tempMetadataDto = null;
         try {
@@ -219,11 +198,15 @@ public class ImageServiceImpl implements ImageService {
                     String[] properties = tag.toString().split(" - ");
                     tempMetadataDto = new ImageMetadataDto();
                     tempMetadataDto.setName(properties[0]);
-                    tempMetadataDto.setValue(properties[1]);
+                    if (properties.length != 2) {
+                        tempMetadataDto.setValue("");
+                    }
+                    else {
+                        tempMetadataDto.setValue(properties[1]);
+                    }
                     metadataDtos.add(tempMetadataDto);
                 }
             }
-            String something = "";
         } catch (ImageProcessingException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {

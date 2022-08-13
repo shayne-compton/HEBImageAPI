@@ -1,9 +1,6 @@
 package com.shaynecomptondev.hebimageapi;
 
-import com.shaynecomptondev.hebimageapi.services.GoogleImageAnalyzer;
-import com.shaynecomptondev.hebimageapi.services.ImageAnalyzer;
-import com.shaynecomptondev.hebimageapi.services.ImageService;
-import com.shaynecomptondev.hebimageapi.services.ImageServiceImpl;
+import com.shaynecomptondev.hebimageapi.services.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -24,4 +21,6 @@ public class HebImageApiApplication {
 	public ImageAnalyzer getImageAnalyzer() {
 		return new GoogleImageAnalyzer();
 	}
+	@Bean
+	public DownloadService getDownloadService() { return new DownloadServiceImpl(); }
 }
