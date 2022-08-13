@@ -24,6 +24,14 @@ public class GoogleImageAnalyzer implements ImageAnalyzer {
     @Value("${GoogleVisionApiKey}")
     private String apiKey;
 
+    public GoogleImageAnalyzer() {
+    }
+
+    public GoogleImageAnalyzer(String imageUri, String apiKey) {
+        this.imageUri = imageUri;
+        this.apiKey = apiKey;
+    }
+
     @Override
     public Iterable<ImageObjectsDto> DetectObjects(byte[] content) {
         if (content == null) {
